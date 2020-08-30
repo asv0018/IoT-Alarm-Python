@@ -1,0 +1,6 @@
+{
+  "apiKey": "AIzaSyBuXVOeKk1oTUwquOLtceDWWVEYz_gJbd0",
+  "authDomain": "iot-alarm-cf8df.firebaseapp.com",
+  "databaseURL": "https://iot-alarm-cf8df.firebaseio.com",
+  "storageBucket": "gs://iot-alarm-cf8df.appspot.com"
+}
