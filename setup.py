@@ -1,3 +1,3 @@
 import InstallPackages
-installation = InstallPackages.InstallPackage("pip", "Scripts/requirements.txt")
+installation = InstallPackages.InstallPackage("pip", "Resources/requirements.txt")
 installation.begin()
