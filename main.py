@@ -225,8 +225,8 @@ def mainLoopWhenNotConnectedToInternet():
         day_num = datetime.today().weekday()
         day = str(calendar.day_name[day_num])
         time = str(now.strftime("%H:%M"))
-        #print(time)
-        # print("Downloaded music files:" + str(downloaded_music_files))
+        print(time)
+         #print("Downloaded music files:" + str(downloaded_music_files))
         #print(all_alarm_times)
         if time in all_alarm_times:
             index = all_alarm_times.index(time)
@@ -247,73 +247,87 @@ def mainLoopWhenNotConnectedToInternet():
 #                                  THE MAIN PROGRAM STARTS HERE                                 #
 #################################################################################################
 
-mixer.init()
-file = open(pathOfConfig, )
-config = json.load(file)
-file.close()
-firebase = pyrebase.initialize_app(config)
-connected_to_internet = False
-try:
-    check_internet = requests.get("https://www.google.com/", timeout=2)
-    print("IoT Alarm is connected to internet :)")
-    connected_to_internet = True
-except:
-    print("NO INTERNET! :< . DEVICE READS PREVIOUS DATA AND ALARMS ACCORDING TO IT")
 
-while True:
-    if connected_to_internet:
-        uid, stream = first_time_init(firebase)
-        if uid is not None and stream is not None:
-            print("STARTed IN MODE")
-            load_all_songs()
+if __name__ == "__main__":
+
+    mixer.init()
+    file = open(pathOfConfig, )
+    config = json.load(file)
+    file.close()
+    firebase = pyrebase.initialize_app(config)
+    connected_to_internet = False
+    try:
+        check_internet = requests.get("https://www.google.com/", timeout=2)
+        print("IoT Alarm is connected to internet :)")
+        connected_to_internet = True
+    except:
+        print("NO INTERNET! :< . DEVICE READS PREVIOUS DATA AND ALARMS ACCORDING TO IT")
+
+    while True:
+        if connected_to_internet:
+            os.system("sudo timedatectl set-ntp True")
+            print("updating the time is done")
+            uid, stream = first_time_init(firebase)
+            if uid is not None and stream is not None:
+                print("STARTed IN MODE")
+                load_all_songs()
+                try:
+                    refill_the_data_to_variables_from_storage()
+                except:
+                    print("There is no data found in the account to play alarm")
+
+
+                playing = False
+                while connected_to_internet:
+                    now = datetime.now()
+                    day_num = datetime.today().weekday()
+                    day = str(calendar.day_name[day_num])
+                    time = str(now.strftime("%H:%M"))
+                    #print(time)
+                    #print("Downloaded music files:" + str(downloaded_music_files))
+                    #print(all_alarm_times)
+                    if time in all_alarm_times:
+                        index = all_alarm_times.index(time)
+                        if day in all_alarm_days_selected[index]:
+                            if all_alarm_plays[index]:
+                                print("Alarm time now")
+                                if not playing:
+                                    mixer.music.load(downloaded_music_files[index])
+                                    mixer.music.play(-1)
+                                    playing = True
+                                    if all_alarm_everyday[index]==False:
+                                        databases = firebase.database().child("alarms_users").child(uid).child(all_alarm_ids[index])
+                                        databases.update({"play":False})
+                    
+                    # I am planning to do some kind of interrupts stuffs here
+                    
+
+
+
+            else:
+                print("OOPS, PLEASE PAIR YOUR DEVICE WITH THE ACCOUNT, RESTART THE DEVICE AND TRY AGAIN")
+                keep_in_while_loop_until_restart = True
+                while keep_in_while_loop_until_restart:
+                    pass # NO PROGRAMME CAN BE WRITTEN HERE
+        else:
+            inner_condition = False
             try:
                 refill_the_data_to_variables_from_storage()
+                print("RETRIEVED PREVIOUSLY SAVED DATA")
+                inner_condition = True
             except:
-                print("There is no data found in the account to play alarm")
-
-
-            playing = False
-            while connected_to_internet:
-                now = datetime.now()
-                day_num = datetime.today().weekday()
-                day = str(calendar.day_name[day_num])
-                time = str(now.strftime("%H:%M"))
-                #print(time)
-                #print("Downloaded music files:" + str(downloaded_music_files))
-                #print(all_alarm_times)
-                if time in all_alarm_times:
-                    index = all_alarm_times.index(time)
-                    if day in all_alarm_days_selected[index]:
-                        if all_alarm_plays[index]:
-                            print("Alarm time now")
-                            if not playing:
-                                mixer.music.load(downloaded_music_files[index])
-                                mixer.music.play(-1)
-                                playing = True
-                                if all_alarm_everyday[index]==False:
-                                    databases = firebase.database().child("alarms_users").child(uid).child(all_alarm_ids[index])
-                                    databases.update({"play":False})
-
-
-
-        else:
-            print("OOPS, PLEASE PAIR YOUR DEVICE WITH THE ACCOUNT, RESTART THE DEVICE AND TRY AGAIN")
-            keep_in_while_loop_until_restart = True
-            while keep_in_while_loop_until_restart:
-                pass # NO PROGRAMME CAN BE WRITTEN HERE
-    else:
-        inner_condition = False
-        try:
-            refill_the_data_to_variables()
-            print("RETRIEVED PREVIOUSLY SAVED DATA")
-            inner_condition = True
-        except:
-            print("OH YOU MIGHT SEEM TO BE A NEW USER :> YOU DONT HAVE ANY ALARMS IN YOUR ACCOUNT :)")
-            print("Get me synced to internet!. Once you get internet")
-            # Write a program in try except block to detect inteernet, if intreernt iss pressent then direclty kill the process and relaunch it. this can be done only in linucx environement
-            while not inner_condition:
+                print("OH YOU MIGHT SEEM TO BE A NEW USER :> YOU DONT HAVE ANY ALARMS IN YOUR ACCOUNT :)")
+                print("Get me synced to internet!. Once you get internet")
+                # Write a program in try except block to detect inteernet, if intreernt iss pressent then direclty kill the process and relaunch it. this can be done only in linucx environement
+                while not inner_condition:
+                    try:
+                        test = requests.get("https://github.com")
+                        print("finally, connected to internet network")
+                        os.system("chmod +x restart_script.sh")
+                        os.system("./restart_script.sh") # this will restart the main script ok!!!
+                    except:
+                        pass
+            while not connected_to_internet:
                 pass
-        while not connected_to_internet:
-            pass
-            # This shall be taken care in linux environment
-            mainLoopWhenNotConnectedToInternet()
+                # This shall be taken care in linux environment
+                mainLoopWhenNotConnectedToInternet()

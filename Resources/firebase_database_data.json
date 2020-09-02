@@ -24,5 +24,18 @@
         "name": "hj",
         "play": true,
         "snooze": false
+    },
+    "2020-09-02T09:33:16": {
+        "days_selected": [
+            "Wednesday"
+        ],
+        "everytime": false,
+        "hours": 9,
+        "id": "2020-09-02T09:33:16",
+        "minutes": 48,
+        "music": "https://firebasestorage.googleapis.com/v0/b/iot-alarm-cf8df.appspot.com/o/music_files%2Fdefault.mp3?alt=media&token=4d59a0ae-2b4b-459c-bd57-b5b5c7bdf47c",
+        "name": "thus",
+        "play": false,
+        "snooze": false
     }
 }

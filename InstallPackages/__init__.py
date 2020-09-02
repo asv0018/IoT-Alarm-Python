@@ -48,9 +48,11 @@ class InstallPackage:
 
 
     def ReadFile(self):
+        file = open(self.filepath, "r")
+
         try:
             file = open(self.filepath, "r")
-        except FileNotFoundError:
+        except :
             print("Requested file not found at the location : "+self.filepath)
             print("please check the file and run the program again")
             exit(0)
